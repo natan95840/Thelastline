@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Last Line</title>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Caveat:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --ink-light: #3a3a5c;
+      --ink-faint: #7a7a9a;
+      --paper: #f5f2e8;
+      --line: #b8c4d4;
+      --red-margin: #c77b7b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Courier Prime', monospace;
+      background-color: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOTEBOOK BACKGROUND ───────────────────── */
+    .notebook-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-color: var(--paper);
+      background-image:
+        repeating-linear-gradient(
+          transparent,
+          transparent 31px,
+          var(--line) 31px,
+          var(--line) 32px
+        );
+      background-size: 100% 32px;
+    }
+
+    .notebook-bg::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* ── LAYOUT ──────────────────────────────────── */
+    .page {
+      position: relative;
+      z-index: 2;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 40px 40px 60px 40px;
+    }
+
+    /* ── HEADER ──────────────────────────────────── */
+    header {
+      padding: 52px 0 28px;
+      animation: fadeDown .8s ease both;
+    }
+
+    .tag {
+      font-family: 'Caveat', cursive;
+      font-size: 1rem;
+      color: var(--ink-faint);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    h1 {
+      font-family: 'Special Elite', serif;
+      font-size: clamp(3rem, 9vw, 6rem);
+      line-height: 1;
+      color: var(--ink);
+      display: inline-block;
+    }
+
+    h1::after {
+      content: '';
+      display: block;
+      height: 3px;
+      background: var(--ink);
+      margin-top: 12px;
+      transform-origin: left;
+      animation: lineGrow 1s .5s ease both;
+    }
+
+    .subtitle {
+      font-family: 'Caveat', cursive;
+      font-size: 1.35rem;
+      color: var(--ink-light);
+      margin-top: 16px;
+      font-weight: 600;
+    }
+
+    /* ── HERO IMAGE ───────────────────────────────── */
+    .hero {
+      margin: 44px 0;
+      border: 2px solid var(--ink);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp .8s .3s ease both;
+      padding: 32px 20px;
+    }
+
+    /* linhas de caderno dentro do hero */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        transparent, transparent 27px,
+        rgba(255,255,255,0.05) 27px, rgba(255,255,255,0.05) 28px
+      );
+      pointer-events: none;
+    }
+
+    /* scanlines */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 4px
+      );
+      pointer-events: none;
+    }
+
+    .hero img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      display: block;
+      /* pixel-art: mantém bordas nítidas sem suavização */
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* ── STORY BOX ───────────────────────────────── */
+    .story-wrap {
+      margin: 44px 0;
+      animation: fadeUp .8s .45s ease both;
+      position: relative;
+    }
+
+    .story-wrap::before {
+      content: '';
+      position: absolute;
+      bottom: -2px; right: -2px;
+      width: 36px; height: 36px;
+      background: linear-gradient(225deg, var(--line) 50%, var(--paper) 50%);
+    }
+
+    .story-box {
+      border: 2px solid var(--ink);
+      padding: 32px 36px;
+      background: rgba(245,242,232,0.7);
+      position: relative;
+    }
+
+    .story-box::before {
+      content: 'HISTÓRIA';
+      font-family: 'Caveat', cursive;
+      font-size: 0.72rem;
+      letter-spacing: 4px;
+      color: var(--ink-faint);
+      position: absolute;
+      top: -10px; left: 20px;
+      background: var(--paper);
+      padding: 0 8px;
+    }
+
+    .story-box p {
+      font-size: 1rem;
+      line-height: 2rem;
+      color: var(--ink-light);
+    }
+
+    .story-box p + p { margin-top: 16px; }
+
+    .hi {
+      font-family: 'Caveat', cursive;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      border-bottom: 2px dashed var(--ink-faint);
+    }
+
+    /* ── SECTION ─────────────────────────────────── */
+    .section { margin: 44px 0; }
+    .s1 { animation: fadeUp .8s .6s ease both; }
+    .s2 { animation: fadeUp .8s .75s ease both; }
+
+    .section-label {
+      font-family: 'Caveat', cursive;
+      font-size: 0.82rem;
+      color: var(--red-margin);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: var(--red-margin); opacity: 0.4;
+    }
+
+    /* ── FEATURE CARDS ───────────────────────────── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+      gap: 18px;
+    }
+
+    .feature-card {
+      border: 1.5px solid var(--ink);
+      padding: 20px 16px;
+      position: relative;
+      background: rgba(245,242,232,0.5);
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-3px) rotate(0.4deg);
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .feature-num {
+      font-family: 'Special Elite', serif; font-size: 2.2rem;
+      color: var(--ink); opacity: 0.1;
+      position: absolute; top: 6px; right: 12px;
+    }
+
+    .feature-title {
+      font-family: 'Caveat', cursive; font-size: 1.1rem;
+      font-weight: 700; color: var(--ink); margin-bottom: 6px;
+    }
+
+    .feature-desc { font-size: 0.82rem; color: var(--ink-faint); line-height: 1.55; }
+
+    /* ── CTA ─────────────────────────────────────── */
+    .cta-wrap {
+      margin: 52px 0 32px;
+      animation: fadeUp .8s .9s ease both;
+      display: flex; flex-direction: column;
+      align-items: flex-start; gap: 18px;
+    }
+
+    .cta-note {
+      font-family: 'Caveat', cursive;
+      font-size: 1rem; color: var(--ink-faint);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .cta-note::before { content: '→'; font-family: 'Special Elite', serif; }
+
+    .btn-download {
+      display: inline-flex; align-items: center; gap: 14px;
+      padding: 18px 44px;
+      background: var(--ink); color: var(--paper);
+      text-decoration: none;
+      font-family: 'Special Elite', serif;
+      font-size: 1.15rem; letter-spacing: 2px; text-transform: uppercase;
+      border: 2px solid var(--ink);
+      position: relative; transition: all .2s;
+    }
+
+    .btn-download::after {
+      content: '';
+      position: absolute; bottom: -6px; right: -6px;
+      width: 100%; height: 100%;
+      border: 2px solid var(--ink);
+      transition: all .2s;
+    }
+
+    .btn-download:hover {
+      background: var(--paper); color: var(--ink);
+      transform: translate(-4px, -4px);
+    }
+
+    .btn-download:hover::after { bottom: -10px; right: -10px; }
+
+    .badge {
+      display: inline-block; padding: 4px 12px;
+      border: 1px solid var(--ink-faint);
+      font-size: 0.72rem; letter-spacing: 1px;
+      font-family: 'Courier Prime', monospace; color: var(--ink-faint);
+    }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 24px 0; margin-top: 48px;
+      font-family: 'Caveat', cursive; font-size: 0.9rem; color: var(--ink-faint);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+
+    /* ── ANIMATIONS ──────────────────────────────── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes lineGrow {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    /* ── MOBILE ──────────────────────────────────── */
+    @media (max-width: 600px) {
+      .page { padding: 32px 22px 48px; }
+      .story-box { padding: 24px 20px; }
+      .btn-download { padding: 14px 28px; font-size: 1rem; }
+      footer { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="notebook-bg"></div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <span class="tag">// jogo independente · android · eeep</span>
+    <h1>The Last<br>Line</h1>
+    <p class="subtitle">Durma. Sonhe. Lute contra seus próprios demônios.</p>
+  </header>
+
+  <!-- HERO — coloque title.png na mesma pasta que este arquivo -->
+  <div class="hero">
+    <img src="title.png" alt="The Last Line" />
+  </div>
+
+  <!-- STORY -->
+  <div class="story-wrap">
+    <div class="story-box">
+      <p>
+        <span class="hi">Luan</span> está na reta final da EEEP. A prova mais importante da sua vida se aproxima — e ele sabe que precisa focar. Só que a aula do <span class="hi">professor Chiquin</span> é pesada demais pra qualquer ser humano resistir.
+      </p>
+      <p>
+        Olhos piscando devagar. Caneta rabiscando qualquer coisa no caderno. Um bonequinho palito desenhado às pressas entre as linhas. E então... o silêncio. Luan adormece encima da folha.
+      </p>
+      <p>
+        No sonho, o <span class="hi">bonequinho ganha vida</span>. Mas o mundo ao redor é uma batalha — feita de tudo que Luan acumulou: procrastinação, distração, desânimo. Cada chefe é um hábito ruim. Cada vitória, uma versão mais forte do Luan real.
+      </p>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section s1">
+    <div class="section-label">O que esperar</div>
+    <div class="features">
+      <div class="feature-card">
+        <span class="feature-num">01</span>
+        <div class="feature-title">Mundo de Caderno</div>
+        <div class="feature-desc">Tudo rabiscado à mão, dentro das páginas de um caderno escolar de verdade.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-num">02</span>
+        <div class="feature-title">Bosses com Propósito</div>
+        <div class="feature-desc">Cada batalha representa algo real. Vencer no jogo inspira vencer na vida.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-num">03</span>
+        <div class="feature-title">Feito no Brasil</div>
+        <div class="feature-desc">Nasceu numa sala de aula da EEEP. Autoral do início ao fim.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-wrap s2">
+    <p class="cta-note">Disponível agora · Gratuito · Android</p>
+    <a class="btn-download" href="https://www.mediafire.com/file/1fp7kvr51y78jyt/The_Last_Line.apk/file" target="_blank" rel="noopener">
+      ⬇&nbsp;&nbsp;Baixar APK
+    </a>
+    <span class="badge">Android · .apk · Habilite "fontes desconhecidas"</span>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© The Last Line — Todos os direitos reservados</span>
+    <span>Feito com tédio, cafeína e criatividade 🖤</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
